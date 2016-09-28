@@ -13,7 +13,7 @@ var KeyMapper = {
 	getCode: function(valueOrEffect) {
 		return this._valueMap[valueOrEffect] || this._effectMap[valueOrEffect].code;
 	}
-}
+};
 
 KeyMapper.create(81, 'Q');
 KeyMapper.create(87, 'W');
@@ -57,8 +57,6 @@ $(document).ready(function() {
   	for (var i = 18; i >= 0; i--) {
   		createSampler().render();
   	}
-  
-
 
   	$('#search-term').submit( function(event){
 		event.preventDefault();
@@ -91,18 +89,14 @@ function createSampler(audioSrc, name) {
 		isPlaying: false,
 		isLooping: false,
 		sound: function(audioSrc, name) {
-			this._aud = new Pizzicato.Sound({ 
-		    	source: 'file',
-		    	options: {
-		    		path: audioSrc,
-		    	}
-			});
+			this._aud = new Pizzicato.Sound(audioSrc);
 			this.name = name;
 			this.audioSrc = audioSrc;
 		},
 		play: function() {
           this._aud.play();
           this.isPlaying = true;
+          console.log(this.isPlaying);
 		},
 		stop: function(){
 		  this._aud.stop();
@@ -121,10 +115,10 @@ function createSampler(audioSrc, name) {
 				self.play();
 			}).on('touchend', function(evt) {
 				self.stop();
-			}).on('drop', function(evt) {
+			}).on('drop', function(evt,ui) {
+				self.sound(ui.draggable[0].children[0].attributes[2].nodeValue,'song');
 				evt.preventDefault();
 				evt.stopPropagation();
-				console.log('hello');
 			});
 			//need to make this node droppable 
 		},
@@ -134,7 +128,7 @@ function createSampler(audioSrc, name) {
 	};
 	
 
-	$(document).keydown(function(evt) {
+	$(document).not('input').keydown(function(evt) {
 		if (evt.keyCode == sampler.keyCode) {
 			sampler.play();
 		}
@@ -246,9 +240,10 @@ function createSampler(audioSrc, name) {
 // drag and drop function i think it goes in the doc . ready
 $( function() {
     // $( ".draggable" ).draggable();
-    $( ".droppable" ).droppable({
+    $( ".droppable li" ).droppable({
       drop: function( event, ui ) {
-    console.log(ui.draggable[0].children[0].attributes[2].nodeValue);
+      	// $(event.target).css('border','1px solid red');
+      	// console.log(event.target);
       }
     });
   } );
@@ -318,11 +313,14 @@ var showError = function(error){
 //need to fix this 
 var getMusic = function (item) {
 	var songItem = $(".templates .result").clone();
+	
 	var songElem = songItem.find('.asong');
 	songElem.attr('href', item.previewUrl);
-	var songElem = songItem.find('.awork');
+	
+	songElem = songItem.find('.awork');
 	songElem.attr('src', item.artworkUrl100);
-	var songElem = songItem.find('p');
+	
+	songElem = songItem.find('p');
 	songElem.text(item.artistName + ' ' + item.trackName);
 	
 	return songItem;
